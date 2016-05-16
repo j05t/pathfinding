@@ -57,23 +57,24 @@ public class PathFinding extends JFrame {
 		add(p);
 	}
 
-	void init () {
+	private boolean init () {
 		START = getStartNode();
 		GOAL = getGoalNode();
 		START.distance = 0;
 		getReachableNodes(START);
+		
+		if (!reachableNodes.contains(GOAL)) {
+			JOptionPane.showMessageDialog(null, "No route to goal node", "Error", JOptionPane.PLAIN_MESSAGE);
+			return false;
+		}
+		else return true;
 	}
 	
 	void dijkstra() {
 		int nodesExplored = 0;
 		
-		init();
-
-		if (!reachableNodes.contains(GOAL)) {
-			JOptionPane.showMessageDialog(null, "No route to goal node", "Error", JOptionPane.PLAIN_MESSAGE);
-			return;
-		}
-
+		if (!init()) return;
+		
 		while (!reachableNodes.isEmpty()) {
 			nodesExplored++;
 			Node u = extract_min(reachableNodes);
@@ -94,12 +95,7 @@ public class PathFinding extends JFrame {
 	private void aStar() {
 		int nodesExplored = 0;
 		
-		init();
-
-		if (!reachableNodes.contains(GOAL)) {
-			JOptionPane.showMessageDialog(null, "No route to goal node", "Error", JOptionPane.PLAIN_MESSAGE);
-			return;
-		}
+		if (!init()) return;
 
 		Node u = START;
 
@@ -120,14 +116,12 @@ public class PathFinding extends JFrame {
 		}
 	}
 	
-	
 	void doneMessage(int nodesExplored) {
 		colorPath(Color.CYAN);
 		JOptionPane.showMessageDialog(null, "Nodes explored: "+nodesExplored + " Distance: " +GOAL.distance, "Finished", JOptionPane.PLAIN_MESSAGE);
 		return;
 	}
 	
-
 	private void colorPath(Color color) {
 		Node start = getStartNode();
 		Node goal = getGoalNode();
