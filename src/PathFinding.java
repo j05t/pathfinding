@@ -23,7 +23,7 @@ public class PathFinding extends JFrame {
 
 	public static void main(String args[]) {
 		// set grid size here
-		int m = 32, n = 32;
+		int m = 48, n = 48;
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -56,8 +56,10 @@ public class PathFinding extends JFrame {
 	}
 
 	void dijkstra() {
+		int nodesExplored = 0;
 		Node start = getStartNode();
 		Node goal = getGoalNode();
+		start.distance = 0;
 
 		getReachableNodes(start);
 
@@ -66,21 +68,74 @@ public class PathFinding extends JFrame {
 			return;
 		}
 
-		start.distance = 0;
-
 		while (!reachableNodes.isEmpty()) {
+			nodesExplored++;
 			Node u = extract_min(reachableNodes);
+			
+			if (u != null && !u.isGoal && !u.isStart && !u.isBlock)
+				u.setBackground(Color.PINK);
 
 			for (Node v : getNeighbors(u))
 				relax(u, v);
+			
+			if (u != null && u.isGoal) {
+				doneMessage(nodesExplored, goal);
+				return;
+			}
+		}
+	}
+	
+	private void aStar() {
+		int nodesExplored = 0;
+		Node start = getStartNode();
+		Node goal = getGoalNode();
+		start.distance = 0;
+		
+		getReachableNodes(start);
+
+		if (!reachableNodes.contains(goal)) {
+			JOptionPane.showMessageDialog(null, "No route to goal node", "Error", JOptionPane.PLAIN_MESSAGE);
+			return;
 		}
 
-		// color shortest path from start to goal
+		Node u = start;
+
+		while (!reachableNodes.isEmpty()) {
+			nodesExplored++;
+			u = extract_min_with_heuristics(reachableNodes);
+			
+			if (u != null && !u.isGoal && !u.isStart && !u.isBlock)
+				u.setBackground(Color.PINK);
+			
+			for (Node v : getNeighbors(u)) 
+				relax(u, v);
+			
+			if (u != null && u.isGoal) {
+				doneMessage(nodesExplored, goal);
+				return;
+			}
+		}
+	}
+	
+	
+	void doneMessage(int nodesExplored, Node goal) {
+		colorPath(Color.CYAN);
+		JOptionPane.showMessageDialog(null, "Nodes explored: "+nodesExplored + " Distance " +goal.distance, "Finished", JOptionPane.PLAIN_MESSAGE);
+		return;
+	}
+	
+
+	private void colorPath(Color color) {
+		Node start = getStartNode();
+		Node goal = getGoalNode();
+
 		Node curNode = goal.predecessor;
+		
 		while (curNode != null && curNode != start) {
-			curNode.setBackground(Color.CYAN);
+			curNode.setBackground(color);
 			curNode = curNode.predecessor;
 		}
+		
 	}
 
 	private void getReachableNodes(Node start) {
@@ -89,8 +144,6 @@ public class PathFinding extends JFrame {
 				node.traversed = true;
 				reachableNodes.add(node);
 				getReachableNodes(node);
-				if (!node.isBlock && !node.isGoal && !node.isStart)
-					node.setBackground(Color.lightGray);
 			}
 		}
 	}
@@ -104,7 +157,26 @@ public class PathFinding extends JFrame {
 		unvisitedNodes.remove(min);
 		return min;
 	}
+	
+	private Node extract_min_with_heuristics(ArrayList<Node> unvisitedNodes) {
+		Node min = unvisitedNodes.get(0);
+		for (Node node : unvisitedNodes) {
+			if (node.distance + getHeuristic(node) < min.distance + getHeuristic(min))
+				min = node;
+		}
+		unvisitedNodes.remove(min);
+		return min;
+	}
+	
+	double getHeuristic (Node node) {
+		Node goal = getGoalNode();
 
+		int rows_away = Math.abs(goal.m - node.m);
+		int cols_away= Math.abs(goal.n - node.n);
+
+		return Math.min(rows_away,cols_away)*14+Math.max(rows_away,cols_away)*10;
+	}
+		
 	private void relax(Node u, Node v) {
 		if (u.distance + 1 < v.distance) {
 			v.distance = u.distance + 1;
@@ -158,6 +230,7 @@ public class PathFinding extends JFrame {
 		JMenu file = new JMenu("Find Path");
 		JMenu help = new JMenu("Help");
 		JMenuItem dMenuItem = new JMenuItem("Dijkstra");
+		JMenuItem aStarMenuItem = new JMenuItem("A*");
 		JMenuItem resetMenuItem = new JMenuItem("Reset");
 		JMenuItem helpMenuItem = new JMenuItem("About");
 
@@ -166,6 +239,17 @@ public class PathFinding extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (STARTSET && GOALSET)
 					dijkstra();
+				else
+					JOptionPane.showMessageDialog(null, "Set start and goal first!", "Error",
+							JOptionPane.PLAIN_MESSAGE);
+			}
+		});
+		
+		aStarMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (STARTSET && GOALSET)
+					aStar();
 				else
 					JOptionPane.showMessageDialog(null, "Set start and goal first!", "Error",
 							JOptionPane.PLAIN_MESSAGE);
@@ -191,6 +275,7 @@ public class PathFinding extends JFrame {
 		});
 
 		file.add(dMenuItem);
+		file.add(aStarMenuItem);
 		file.add(resetMenuItem);
 		help.add(helpMenuItem);
 		menubar.add(file);
