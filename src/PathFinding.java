@@ -171,9 +171,17 @@ public class PathFinding extends JFrame {
 	}
 
 	private void relax(Node u, Node v) {
-		if (u.distance + 1 < v.distance) {
-			v.distance = u.distance + 1;
-			v.predecessor = u;
+		// horizontal or vertical move
+		if (u.m == v.m || u.n == v.n) {
+			if (u.distance + 10 < v.distance) {
+				v.distance = u.distance + 10;
+				v.predecessor = u;
+			}
+		} else { // diagonal move
+			if (u.distance + 14 < v.distance) {
+				v.distance = u.distance + 14;
+				v.predecessor = u;
+			}
 		}
 	}
 
@@ -215,8 +223,7 @@ public class PathFinding extends JFrame {
 	private void createMenuBar() {
 		String helptitle = "Java implementation of the Dijkstra and A* algorithms";
 		String helpmessage = "Set the start node with left mouse button.\n"
-				+ "Set the goal node with right mouse button.\n\n" 
-				+ "Set obstacle with middle mouse button or\n"
+				+ "Set the goal node with right mouse button.\n\n" + "Set obstacle with middle mouse button or\n"
 				+ "by moving your mouse while holding ALT.";
 
 		JMenuBar menubar = new JMenuBar();
