@@ -16,6 +16,8 @@ public class PathFinding extends JFrame {
 
 	public static boolean STARTSET = false;
 	public static boolean GOALSET = false;
+	
+	private static Node START, GOAL;
 
 	private ArrayList<Node> nodes;
 	private ArrayList<Node> reachableNodes;
@@ -55,15 +57,19 @@ public class PathFinding extends JFrame {
 		add(p);
 	}
 
+	void init () {
+		START = getStartNode();
+		GOAL = getGoalNode();
+		START.distance = 0;
+		getReachableNodes(START);
+	}
+	
 	void dijkstra() {
 		int nodesExplored = 0;
-		Node start = getStartNode();
-		Node goal = getGoalNode();
-		start.distance = 0;
+		
+		init();
 
-		getReachableNodes(start);
-
-		if (!reachableNodes.contains(goal)) {
+		if (!reachableNodes.contains(GOAL)) {
 			JOptionPane.showMessageDialog(null, "No route to goal node", "Error", JOptionPane.PLAIN_MESSAGE);
 			return;
 		}
@@ -79,7 +85,7 @@ public class PathFinding extends JFrame {
 				relax(u, v);
 			
 			if (u != null && u.isGoal) {
-				doneMessage(nodesExplored, goal);
+				doneMessage(nodesExplored);
 				return;
 			}
 		}
@@ -87,18 +93,15 @@ public class PathFinding extends JFrame {
 	
 	private void aStar() {
 		int nodesExplored = 0;
-		Node start = getStartNode();
-		Node goal = getGoalNode();
-		start.distance = 0;
 		
-		getReachableNodes(start);
+		init();
 
-		if (!reachableNodes.contains(goal)) {
+		if (!reachableNodes.contains(GOAL)) {
 			JOptionPane.showMessageDialog(null, "No route to goal node", "Error", JOptionPane.PLAIN_MESSAGE);
 			return;
 		}
 
-		Node u = start;
+		Node u = START;
 
 		while (!reachableNodes.isEmpty()) {
 			nodesExplored++;
@@ -111,16 +114,16 @@ public class PathFinding extends JFrame {
 				relax(u, v);
 			
 			if (u != null && u.isGoal) {
-				doneMessage(nodesExplored, goal);
+				doneMessage(nodesExplored);
 				return;
 			}
 		}
 	}
 	
 	
-	void doneMessage(int nodesExplored, Node goal) {
+	void doneMessage(int nodesExplored) {
 		colorPath(Color.CYAN);
-		JOptionPane.showMessageDialog(null, "Nodes explored: "+nodesExplored + " Distance " +goal.distance, "Finished", JOptionPane.PLAIN_MESSAGE);
+		JOptionPane.showMessageDialog(null, "Nodes explored: "+nodesExplored + " Distance: " +GOAL.distance, "Finished", JOptionPane.PLAIN_MESSAGE);
 		return;
 	}
 	
@@ -160,19 +163,21 @@ public class PathFinding extends JFrame {
 	
 	private Node extract_min_with_heuristics(ArrayList<Node> unvisitedNodes) {
 		Node min = unvisitedNodes.get(0);
+		double minDist = min.distance + getHeuristic(min);
+		
 		for (Node node : unvisitedNodes) {
-			if (node.distance + getHeuristic(node) < min.distance + getHeuristic(min))
+			if (node.distance + getHeuristic(node) < minDist) {
 				min = node;
+				minDist = min.distance + getHeuristic(min);
+			}
 		}
 		unvisitedNodes.remove(min);
 		return min;
 	}
 	
 	double getHeuristic (Node node) {
-		Node goal = getGoalNode();
-
-		int rows_away = Math.abs(goal.m - node.m);
-		int cols_away= Math.abs(goal.n - node.n);
+		int rows_away = Math.abs(GOAL.m - node.m);
+		int cols_away= Math.abs(GOAL.n - node.n);
 
 		return Math.min(rows_away,cols_away)*14+Math.max(rows_away,cols_away)*10;
 	}
