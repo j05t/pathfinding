@@ -32,26 +32,11 @@ public class Node extends JButton implements MouseListener {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void mouseEntered(MouseEvent e) {
 		if (e.isAltDown() && !isBlock && !isStart && !isGoal) {
 			setBackground(Color.BLUE);
 			isBlock = true;
 		}
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
 	}
 
 	public void reset() {
@@ -61,5 +46,20 @@ public class Node extends JButton implements MouseListener {
 		traversed = false;
 		distance = Integer.MAX_VALUE;
 		setBackground(null);
+	}
+	
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
 	}
 }
