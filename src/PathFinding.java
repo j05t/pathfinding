@@ -222,7 +222,7 @@ public class PathFinding extends JFrame {
 	}
 
 	private void createMenuBar() {
-		String helptitle = "Java implementation of the Dijkstra and A* algorithms";
+		String helptitle = "Dijkstra and A*";
 		String helpmessage = "Set the start node with left mouse button.\n"
 				+ "Set the goal node with right mouse button.\n\n" 
 				+ "Set obstacle with middle mouse button or\n"
