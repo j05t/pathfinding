@@ -167,7 +167,8 @@ public class PathFinding extends JFrame {
 		int rows_away = Math.abs(GOAL.m - node.m);
 		int cols_away = Math.abs(GOAL.n - node.n);
 
-		return Math.min(rows_away, cols_away) * 14 + Math.max(rows_away, cols_away) * 10;
+		// admissible heuristic - don't overestimate the cost of reaching the goal
+		return Math.min(rows_away, cols_away) * 10 + Math.max(rows_away, cols_away) * 6;
 	}
 
 	private void relax(Node u, Node v) {
