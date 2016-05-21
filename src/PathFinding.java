@@ -25,7 +25,7 @@ public class PathFinding extends JFrame {
 
 	public static void main(String args[]) {
 		// set grid size here
-		int m = 48, n = 48;
+		final int m = 48, n = 48;
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -222,8 +222,8 @@ public class PathFinding extends JFrame {
 	}
 
 	private void createMenuBar() {
-		String helptitle = "Dijkstra and A*";
-		String helpmessage = "Set the start node with left mouse button.\n"
+		final String helptitle = "Dijkstra and A*";
+		final String helpmessage = "Set the start node with left mouse button.\n"
 				+ "Set the goal node with right mouse button.\n\n" 
 				+ "Set obstacle with middle mouse button or\n"
 				+ "by moving your mouse while holding ALT.";
